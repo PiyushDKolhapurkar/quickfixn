@@ -3,7 +3,7 @@
 Gathers your friends from Facebook, Instagram and your WhatsApp/phone
 contacts, remembers their birthdays, and wishes them on the day.
 
-Pure Python 3.11+, no dependencies.
+Written in C# (.NET 8). It uses only the standard .NET libraries; nothing else to install.
 
 ## What each platform allows
 
@@ -24,25 +24,31 @@ emailed), and each wish takes one tap.
 
 ## Setup
 
+Install the [.NET 8 SDK](https://dotnet.microsoft.com/download), then:
+
 ```bash
 cd birthday-bot
-cp config.example.toml config.toml        # edit as needed
+dotnet publish src/BirthdayBot -c Release -o out   # builds ./out/BirthdayBot
+cp config.example.json config.json                 # edit as needed
 ```
+
+The examples below use `./out/BirthdayBot`. On Windows use `out\BirthdayBot.exe`.
+While developing you can use `dotnet run --project src/BirthdayBot -- <command>` instead.
 
 ### 1. Import your friends
 
 ```bash
 # Phone / WhatsApp contacts (Android: Contacts > Export; iPhone: iCloud.com > Export vCard)
-python -m birthday_bot import vcard ~/Downloads/contacts.vcf
+./out/BirthdayBot import vcard ~/Downloads/contacts.vcf
 
 # Google Contacts (contacts.google.com > Export > Google CSV)
-python -m birthday_bot import google ~/Downloads/contacts.csv
+./out/BirthdayBot import google ~/Downloads/contacts.csv
 
 # Facebook: Settings > Download your information > JSON
-python -m birthday_bot import facebook ~/fb/connections/friends/your_friends.json
+./out/BirthdayBot import facebook ~/fb/connections/friends/your_friends.json
 
 # Instagram: Accounts Center > Download your information > JSON
-python -m birthday_bot import instagram ~/ig/connections/followers_and_following/following.json
+./out/BirthdayBot import instagram ~/ig/connections/followers_and_following/following.json
 ```
 
 Everything is merged by name into `data/contacts.csv`. Importing again won't
@@ -69,8 +75,8 @@ See `contacts.example.csv` for an example.
 ### 3. Check it
 
 ```bash
-python -m birthday_bot upcoming --days 30
-python -m birthday_bot run --dry-run
+./out/BirthdayBot upcoming --days 30
+./out/BirthdayBot run --dry-run
 ```
 
 ### 4. Run it every day
@@ -78,13 +84,13 @@ python -m birthday_bot run --dry-run
 Use either cron:
 
 ```cron
-0 9 * * *  cd /path/to/birthday-bot && /usr/bin/python3 -m birthday_bot run >> bot.log 2>&1
+0 9 * * *  cd /path/to/birthday-bot && ./out/BirthdayBot run >> bot.log 2>&1
 ```
 
-or a long-running process:
+(on Windows, use Task Scheduler to run `BirthdayBot.exe run` daily), or a long-running process:
 
 ```bash
-python -m birthday_bot daemon --at 09:00
+./out/BirthdayBot daemon --at 09:00
 ```
 
 The bot remembers who it has already wished each year in `data/sent.json`,
@@ -97,8 +103,8 @@ on Feb 28 in non-leap years.
    business phone number.
 2. Create a message template, e.g. `birthday_wish` with the body
    `Happy birthday {{1}}! 🎉 Have a wonderful day.`, and wait for approval.
-3. In `config.toml`, set `[whatsapp_cloud] enabled = true` and fill in
-   `phone_number_id` and `template_name`. Export `WHATSAPP_TOKEN=...`.
+3. In `config.json`, set `"whatsAppCloud": { "enabled": true, ... }` and fill in
+   `phone_number_id` and `template_name`. Set the `WHATSAPP_TOKEN` environment variable to your access token.
 
 The bot fills `{{1}}` with the person's first name. If a send fails, it falls
 back to a reminder link, so nobody gets missed. Meta's rules require that
@@ -106,11 +112,11 @@ recipients have agreed to get messages from your business number.
 
 ## Email reminders
 
-Fill in `[reminders]` in `config.toml`. For Gmail, use `smtp.gmail.com` and
+Fill in the `reminders` section of `config.json`. For Gmail, use `smtp.gmail.com` and
 an app password in `SMTP_PASSWORD`.
 
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -t .
+dotnet test
 ```

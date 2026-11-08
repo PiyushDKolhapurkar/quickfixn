@@ -1,0 +1,40 @@
+// Copy to config.json and edit. Comments are allowed in this file.
+// Secrets can also come from environment variables:
+//   WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID, SMTP_PASSWORD
+{
+  "contactsFile": "data/contacts.csv",
+  "stateFile": "data/sent.json",
+
+  // Used to turn local numbers like 09876 543210 into +919876543210.
+  "defaultCountryCode": "91",
+
+  // Preferred order when a contact has several handles and no 'channel' set.
+  "channelOrder": ["whatsapp", "instagram", "facebook"],
+
+  // One is picked at random per person. Placeholders: {first_name} {name} {age}
+  "messages": [
+    "Happy birthday, {first_name}! 🎉 Wishing you a fantastic year ahead.",
+    "Happy birthday {first_name}! 🎂 Hope your day is as awesome as you are."
+  ],
+
+  // Fully automatic WhatsApp sending through Meta's official WhatsApp Cloud API.
+  // Needs a WhatsApp Business number and an approved template whose body has
+  // one variable, e.g. "Happy birthday {{1}}! 🎉 Have a great day."
+  "whatsAppCloud": {
+    "enabled": false,
+    "phoneNumberId": "",
+    "accessToken": "",          // better: set the WHATSAPP_TOKEN env var
+    "templateName": "birthday_wish",
+    "templateLanguage": "en"
+  },
+
+  // Reminders with one-tap chat links, for Instagram / Facebook / personal
+  // WhatsApp. Always printed to the console; also emailed if SMTP is set.
+  "reminders": {
+    "emailTo": "",
+    "smtpHost": "",             // e.g. smtp.gmail.com (use an app password)
+    "smtpPort": 587,
+    "smtpUser": "",
+    "smtpPassword": ""          // better: set the SMTP_PASSWORD env var
+  }
+}

@@ -1,4 +1,5 @@
-config.toml
+config.json
 data/
-__pycache__/
-*.pyc
+bin/
+obj/
+*.user
